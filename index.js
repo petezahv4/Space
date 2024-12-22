@@ -1,3 +1,4 @@
+
 import express from 'express';
 import cors from 'cors';
 import http from 'node:http';
@@ -15,7 +16,6 @@ const server = http.createServer();
 const app = express();
 const __dirname = process.cwd();
 const PORT = process.env.PORT || 6060;
-const desiredIP = '192.168.1.6'; // Replace with your actual IP
 
 app.use(cors());
 app.use(express.urlencoded({ extended: true }));
@@ -47,27 +47,27 @@ server.on('listening', () => {
 	console.log(
 		chalk.bold(
 			theme(`
-	███████╗██████╗  █████╗  ██████╗███████╗
+	███████╗██████╗  █████╗  ██████╗███████╗
 	██╔════╝██╔══██╗██╔══██╗██╔════╝██╔════╝
-	███████╗██████╔╝███████║██║     █████╗  
-	╚════██║██╔═══╝ ██╔══██║██║     ██╔══╝  
-	███████║██║     ██║  ██║╚██████╗███████╗
-	╚══════╝╚═╝     ╚═╝  ╚═╝ ╚═════╝╚══════╝
+	███████╗██████╔╝███████║██║     █████╗  
+	╚════██║██╔═══╝ ██╔══██║██║     ██╔══╝  
+	███████║██║     ██║  ██║╚██████╗███████╗
+	╚══════╝╚═╝     ╚═╝  ╚═╝ ╚═════╝╚══════╝
 											
 	`)
 		)
 	);
 	console.log(
-		`  <span class="math-inline">\{chalk\.bold\(host\('Local System\:'\)\)\}            http\://</span>{desiredIP}${address.port === 80 ? '' : ':' + chalk.bold(address.port)}`
+		`  ${chalk.bold(host('Local System:'))}            http://${address.family === 'IPv6' ? `[${address.address}]` : address.address}${address.port === 80 ? '' : ':' + chalk.bold(address.port)}`
 	);
 
 	console.log(
-		`  <span class="math-inline">\{chalk\.bold\(host\('Local System\:'\)\)\}            http\://localhost</span>{address.port === 8080 ? '' : ':' + chalk.bold(address.port)}`
+		`  ${chalk.bold(host('Local System:'))}            http://localhost${address.port === 8080 ? '' : ':' + chalk.bold(address.port)}`
 	);
 
 	try {
 		console.log(
-			`  <span class="math-inline">\{chalk\.bold\(host\('On Your Network\:'\)\)\}  http\://</span>{hostname()}${address.port === 8080 ? '' : ':' + chalk.bold(address.port)}`
+			`  ${chalk.bold(host('On Your Network:'))}  http://${hostname()}${address.port === 8080 ? '' : ':' + chalk.bold(address.port)}`
 		);
 	} catch (err) {
 		// can't find LAN interface
@@ -75,10 +75,24 @@ server.on('listening', () => {
 
 	if (process.env.REPL_SLUG && process.env.REPL_OWNER) {
 		console.log(
-			`  <span class="math-inline">\{chalk\.bold\(host\('Replit\:'\)\)\}           https\://</span>{process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`
+			`  ${chalk.bold(host('Replit:'))}           https://${process.env.REPL_SLUG}.${process.env.REPL_OWNER}.repl.co`
 		);
 	}
 
 	if (process.env.HOSTNAME && process.env.GITPOD_WORKSPACE_CLUSTER_HOST) {
 		console.log(
-			`  <span class="math-inline">\{chalk\.bold\(host\('Gitpod\:'\)\)\}           https\://</span>{PORT}-<span class="math-inline">\{process\.env\.HOSTNAME\}\.</span>{process.env.GITPOD_WORKSPACE_CLUSTER_
+			`  ${chalk.bold(host('Gitpod:'))}           https://${PORT}-${process.env.HOSTNAME}.${process.env.GITPOD_WORKSPACE_CLUSTER_HOST}`
+		);
+	}
+
+	if (
+		process.env.CODESPACE_NAME &&
+		process.env.GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN
+	) {
+		console.log(
+			`  ${chalk.bold(host('Github Codespaces:'))}           https://${process.env.CODESPACE_NAME}-${address.port === 80 ? '' : address.port}.${process.env.GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN}`
+		);
+	}
+});
+
+server.listen(PORT);
